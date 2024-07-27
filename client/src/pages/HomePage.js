@@ -20,7 +20,7 @@ function HomePage(){
 
     return (
         <div>
-            <ContactForm contact={contact} setContacts={setContacts} setContact={setContact}></ContactForm>
+            {/* <ContactForm contact={contact} setContacts={setContacts} setContact={setContact}></ContactForm> */}
             <ContactList contacts={contacts} setContacts={setContact} setContact={setContacts}></ContactList>
 
         </div>
