@@ -1,14 +1,43 @@
+import React, {useState, useEffect} from "react";
 import "./App.css";
 import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
 import Modal from "./components/Modal"
+import ContactList from "./components/ContactList";
 import './index.css';
+import axios from "axios";
 function App() {
+
+  const [isModalVisible, setIsModalVisible] =useState(false);
+  const [heading, setHeading] = useState("")
+  const [newkey, setNewKey] = useState("")
+  const [contacts, setContacts] = useState([])
+  const toggleModal = (currentHeading="", currentkey="")=>{
+    setIsModalVisible(!isModalVisible)
+    setHeading(currentHeading)
+    setNewKey(currentkey)
+  }
+
+
+  // Fetch Contacts
+
+  const fetchContacts = async() =>{
+    const response = await axios.get("/api/contacts");
+    setContacts(response.data)
+  }
+
+  // Fetch Function on Intital Render
+
+  useEffect(()=>{
+    fetchContacts();
+  },[]);
+
+
   return (
     <div className="App">
-      <Navbar />
-      <HomePage />
-      <Modal/>
+      <Navbar toggleModal={toggleModal}/>
+      <ContactList contacts={contacts}/>
+      {isModalVisible && <Modal heading={heading} selectedKey={newkey} toggleModal={toggleModal}/>}
     </div>
   );
 }

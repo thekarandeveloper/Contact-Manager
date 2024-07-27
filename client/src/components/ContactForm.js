@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function ContactForm({ contact, setContact, setContacts }) {
+function ContactForm({ contact, setContact, setContacts, contactListChange }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
