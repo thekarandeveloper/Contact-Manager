@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function ContactForm({ contact, setContact, setContacts, contactListChange }) {
+function ContactForm({ contact, setContact, setContacts, fetchContactsData, toggleModal }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -15,38 +15,39 @@ function ContactForm({ contact, setContact, setContacts, contactListChange }) {
     }
   }, [contact]);
 
-  // Function to fetch contacts
-  const fetchContacts = async () => {
-    try {
-      const response = await axios.get("/api/contacts");
-      setContacts(response.data);
-    } catch (error) {
-      console.error("Error fetching contacts:", error);
-    }
-  };
-
-  // Handle form submission
+  function fetchContacts() {
+    console.log("Fetch Function Called");
+    fetchContactsData()
+  }
+    // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const newContact = { name, email, phone };
 
     try {
       if (contact) {
-        console.log("Trying to Add Contact");
+        console.log("Trying to Update Contact");
         // Update existing contact
         await axios.put(`/api/contacts/${contact._id}`, newContact);
+        fetchContacts()
       } else {
         // Add new contact
         console.log("Trying to Add Contact");
         await axios.post("/api/contacts", newContact);
+        toggleModal()
       }
+      
+      // setContact(null);
+      // Fetch updated contacts
+      console.log("Calling fetchContacts");
+
+      fetchContacts();
+
       // Clear form fields
       setName("");
       setEmail("");
       setPhone("");
-      setContact(null);
-      // Fetch updated contacts
-      fetchContacts();
+      toggleModal()
     } catch (error) {
       console.error("Error saving contact:", error);
     }

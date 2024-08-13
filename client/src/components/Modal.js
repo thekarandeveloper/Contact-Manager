@@ -5,19 +5,26 @@ import { IoMdClose } from "react-icons/io";
 
 
 
-function ModalContent({ selectedKey }) {
-  switch (selectedKey) {
-    case "add":
-      return <ContactForm />;
-    case "import":
-      return <UploadCSV />;
-    case "duplicate":
-      return <UploadCSV />;
-    default:
-      return null;
+function Modal({ heading, selectedKey,contactToUpdate, toggleModal, fetchContacts }) {
+
+  function ModalContent({ selectedKey }) {
+    switch (selectedKey) {
+      case "add":
+        return <ContactForm  fetchContactsData={fetchContacts} toggleModal={toggleModal}/>;
+        case "edit":
+          return <ContactForm  contact={contactToUpdate} fetchContactsData={fetchContacts} toggleModal={toggleModal}/>;
+      case "import":
+        return <UploadCSV />;
+      case "duplicate":
+        return <UploadCSV />;
+      default:
+        return null;
+    }
   }
-}
-function Modal({ heading, selectedKey,contactListChange, toggleModal }) {
+
+
+
+
   return (
     <div className="bg-[#62626260] fixed top-0 w-full min-h-[100vh] flex justify-center items-center ">
       <div className="modal bg-white w-6/12 min-h-auto border-2 border-white rounded-md">

@@ -47,3 +47,14 @@ exports.deleteContact = async (req,res) =>{
     }
 };
 
+
+// Delete All Contacts
+
+exports.deleteAllContact = async(req,res) => {
+    try{
+        await Contact.deleteMany({});
+        res.status(200).json({ message: 'All contacts deleted successfully' });
+    } catch (err){
+        res.status(400).json({msg: "Bad Request"})
+    }
+};
