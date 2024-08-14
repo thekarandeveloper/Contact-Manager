@@ -14,7 +14,7 @@ function Modal({ heading, selectedKey, contactToUpdate, toggleModal, fetchContac
       case "edit":
           return <ContactForm  contact={contactToUpdate} fetchContactsData={fetchContacts} toggleModal={toggleModal}/>;
       case "import":
-        return <UploadCSV />;
+        return <UploadCSV fetchChanges={fetchContacts} toggleModal={toggleModal} />;
       case "duplicates":
         console.log(allContacts);
         return <FindDuplicates contacts={allContacts} fetchChanges={fetchContacts} toggleModal={toggleModal}/>;

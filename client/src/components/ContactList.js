@@ -5,6 +5,7 @@ import { useState } from "react";
 function ContactList({ contacts, editContact, setContacts }) {
 
   const [selectContact, setSelectContact] = useState("")
+  const [allSelected, setAllSelected] = useState(false)
   // const [contact, setContact] = useState(null)
   var selectedContactIdList = []
   const handleDelete = async (id) => {
@@ -12,10 +13,35 @@ function ContactList({ contacts, editContact, setContacts }) {
     setContacts(contacts.filter((contact) => contact._id !== id));
   };
   const handleBulkDelete = async () => {
+
     await axios.delete('/api/contacts')
     setContacts([]);
      document.getElementById("bulkDeleteButton").style.display = "none"
   };
+
+  function handleBulkDeleteSelection() {
+    
+    if (allSelected){
+      handleBulkDelete()
+    } else{
+      selectedContactIdList.forEach((selectedContactID) =>{
+        
+        console.log(selectedContactIdList);
+        handleDelete(selectedContactID)
+        
+      })
+    }
+    document.getElementById("bulkDeleteButton").style.display = "none"
+    selectedContactIdList = []
+    document.querySelectorAll(".editButton").forEach((selectedRow) => { 
+
+      selectedRow.style.visibility = "visible"
+     
+   
+
+    });
+  }
+
   function handleContactSelection(contactID){
 
 
@@ -31,9 +57,6 @@ function ContactList({ contacts, editContact, setContacts }) {
        
         document.querySelectorAll(".editButton").forEach((selectedRow) => { 
           selectedRow.style.visibility = "hidden"
-          
-        
-  
          });
     } else{
        document.getElementById("bulkDeleteButton").style.display = "none"
@@ -50,6 +73,8 @@ function ContactList({ contacts, editContact, setContacts }) {
   }
 
   function handleBulkSelection() {
+
+    setAllSelected(true)
     document.querySelectorAll(".deleteButton").forEach((checkbox) => { 
 
       checkbox.checked = !checkbox.checked
@@ -64,8 +89,9 @@ function ContactList({ contacts, editContact, setContacts }) {
 const tableStyle = {
   height: contacts.length === 0 ? '80vh' : 'auto', // Adjust '400px' as needed
   backgroundImage: contacts.length === 0 ? `url("../assets/404.svg")` : 'none',
-  backgroundSize: '20%',
+  backgroundSize: '15%',
   backgroundRepeat: 'no-repeat',
+  backgroundPosition:'center',
   transition:"1s",
 };
 
@@ -83,7 +109,7 @@ const tableStyle = {
           <th className="w-30 ">Email</th>
           <th className="w-25 ">Phone</th>
           <th className="w-20 "></th>
-          <th className="w-20 "><button id="bulkDeleteButton" onClick={handleBulkDelete} className="p-2 flex flex-row border border-1 rounded-md bg-[#f64e4e] text-white hidden"> <MdDeleteOutline /></button></th>
+          <th className="w-20 "><button id="bulkDeleteButton" onClick={handleBulkDeleteSelection} className="p-2 flex flex-row border border-1 rounded-md bg-[#f64e4e] text-white hidden"> <MdDeleteOutline /></button></th>
           </tr>
         </thead>
         <tbody>
