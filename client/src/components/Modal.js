@@ -2,21 +2,22 @@ import React from "react";
 import ContactForm from "./ContactForm";
 import UploadCSV from "./UploadCSV";
 import { IoMdClose } from "react-icons/io";
+import FindDuplicates from "./FindDuplicates.js";
 
 
-
-function Modal({ heading, selectedKey,contactToUpdate, toggleModal, fetchContacts }) {
+function Modal({ heading, selectedKey, contactToUpdate, toggleModal, fetchContacts, allContacts }) {
 
   function ModalContent({ selectedKey }) {
     switch (selectedKey) {
       case "add":
         return <ContactForm  fetchContactsData={fetchContacts} toggleModal={toggleModal}/>;
-        case "edit":
+      case "edit":
           return <ContactForm  contact={contactToUpdate} fetchContactsData={fetchContacts} toggleModal={toggleModal}/>;
       case "import":
         return <UploadCSV />;
-      case "duplicate":
-        return <UploadCSV />;
+      case "duplicates":
+        console.log(allContacts);
+        return <FindDuplicates contacts={allContacts} fetchChanges={fetchContacts} toggleModal={toggleModal}/>;
       default:
         return null;
     }

@@ -12,7 +12,6 @@ function ContactList({ contacts, editContact, setContacts }) {
     setContacts(contacts.filter((contact) => contact._id !== id));
   };
   const handleBulkDelete = async () => {
-    // await axios.delete(`/api/contacts/`);
     await axios.delete('/api/contacts')
     setContacts([]);
      document.getElementById("bulkDeleteButton").style.display = "none"
@@ -47,7 +46,7 @@ function ContactList({ contacts, editContact, setContacts }) {
        });
        
     }
-
+    
   }
 
   function handleBulkSelection() {
@@ -61,10 +60,19 @@ function ContactList({ contacts, editContact, setContacts }) {
 
      })
   }
+// Conditional height style
+const tableStyle = {
+  height: contacts.length === 0 ? '80vh' : 'auto', // Adjust '400px' as needed
+  backgroundImage: contacts.length === 0 ? `url("../assets/404.svg")` : 'none',
+  backgroundSize: '20%',
+  backgroundRepeat: 'no-repeat',
+  transition:"1s",
+};
 
   return (
+   
     <section className="overflow-hidden rounded-lg">
-      <table className="table-fixed contact-list w-full bg-white rounded-lg ">
+      <table className="table-fixed w-full bg-white rounded-lg contact-list" style={tableStyle}>
         <thead>
         <tr className="bg-[#e6e6e6cf] rounded-md">
           <th className="py-4 w-12">

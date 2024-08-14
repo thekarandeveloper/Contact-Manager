@@ -40,7 +40,7 @@ function App() {
     <div className="App">
       <Navbar toggleModal={toggleModal}/>
       <ContactList contacts={contacts} editContact={editContact} setContacts={setContacts}/>
-      {isModalVisible && <Modal heading={heading} selectedKey={newkey} toggleModal={toggleModal} fetchContacts={fetchContacts} contactToUpdate={contactToUpdate}/>}
+      {isModalVisible && <Modal heading={heading} selectedKey={newkey} toggleModal={toggleModal} fetchContacts={fetchContacts} contactToUpdate={contactToUpdate} allContacts={contacts}/>}
     </div>
   );
 }
