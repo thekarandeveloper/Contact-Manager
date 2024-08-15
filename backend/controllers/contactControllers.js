@@ -77,10 +77,17 @@ exports.getContacts = async (req, res) => {
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 20;
         const skip = (page - 1) * limit;
+        const searchQuery = req.query.search || '';
+
+        // Query Object
+        const query = searchQuery 
+            ? {name: {$regex: searchQuery, $options: 'i'}}
+            :{}
+
 
         const [contacts, total] = await Promise.all([
-            Contact.find().skip(skip).limit(limit).exec(),
-            Contact.countDocuments()
+            Contact.find(query).skip(skip).limit(limit).exec(),
+            Contact.countDocuments(query)
         ]);
 
         res.json({

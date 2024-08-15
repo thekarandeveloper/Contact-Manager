@@ -6,38 +6,52 @@ import { FixedSizeList as List } from "react-window";
 import ContactTableRow from "./ContactTableRow";
 import PropTypes from "prop-types"
 
-function ContactList({ contacts, editContact, setContacts }) {
+function ContactList({ contacts, editContact, setContacts, searchTerm }) {
   const listRef = useRef(null)
+  
   const [selectContact, setSelectContact] = useState("");
   const [allSelected, setAllSelected] = useState(false);
   var selectedContactIdList = [];
   const rowHeight = 50;
   const height = 600;
- 
+  const [page, setPage] = useState(1);
+
   const [hasMore, setHasMore] = useState(true);
-  const loadMoreContacts = async () => {
+  const loadMoreContacts = async (searchString = searchTerm) => {
     if (hasMore) {
-      try {
-        // Fetch more contacts here and update the list
-        const response = await axios.get('/api/contacts'); // Adjust URL and parameters as needed
-        const { contacts: newContacts } = response.data;
-        if (newContacts.length > 0) {
-          setContacts(prevContacts => [...prevContacts, ...newContacts]);
-        } else {
-          setHasMore(false);
+        try {
+            const nextPage = page + 1;
+            const searchTerm = searchString.toLowerCase(); // Normalize the search term
+            
+            const response = await axios.get('/api/contacts', {
+                params: {
+                    page: nextPage,
+                    limit: 20,
+                    search: searchTerm
+                }
+            });
+
+            const newContacts = response.data.contacts;
+            console.log("Full Loadmore Contact list", response.data)
+            if (newContacts.length > 0) {
+                setContacts(prevContacts => [...prevContacts, ...newContacts]);
+                setPage(nextPage); // Update the page state to the next page
+            } else {
+                setHasMore(false); // No more contacts to load
+            }
+        } catch (error) {
+            console.error("Error fetching more contacts:", error);
         }
-      } catch (error) {
-        console.error("Error fetching more contacts:", error);
-      }
     }
-  };
+};
+
 
 
   const handleScroll = ({scrollOffset}) => {
 
     const container = listRef.current;
 
-    if (container && container.scrollHeight - scrollOffset <= height * 1.5){
+    if (container && container.scrollHeight - scrollOffset <= height * 2.5){
       loadMoreContacts()
     }
   
@@ -59,7 +73,7 @@ function ContactList({ contacts, editContact, setContacts }) {
   
   const handleDelete = async (id) => {
     await axios.delete(`/api/contacts/${id}`);
-    setContacts(contacts.filter((contact) => contact._id !== id));
+    setContacts(prevContacts => prevContacts.filter((contact) => contact._id !== id));
   };
   const handleBulkDelete = async () => {
     await axios.delete("/api/contacts");
@@ -72,7 +86,7 @@ function ContactList({ contacts, editContact, setContacts }) {
       handleBulkDelete();
     } else {
       selectedContactIdList.forEach((selectedContactID) => {
-        console.log(selectedContactIdList);
+        console.log(selectedContactID);
         handleDelete(selectedContactID);
       });
     }
@@ -83,13 +97,16 @@ function ContactList({ contacts, editContact, setContacts }) {
     });
   }
 
-  function handleContactSelection(contactID) {
-    if (selectedContactIdList.includes(contactID)) {
-      selectedContactIdList.pop(contactID);
-    } else {
-      selectedContactIdList.push(contactID);
-    }
+  function handleContactSelection(e) {
+    const selectedRow = e.target
+    console.log(selectedRow);
 
+    if (selectedRow.checked){
+      selectedContactIdList.push(selectedRow.dataset.id);
+    } else if (!selectedRow.checked){
+      selectedContactIdList.pop(selectedRow.dataset.id);
+    }
+    console.log(selectedContactIdList)
     if (selectedContactIdList.length >= 2) {
       document.getElementById("bulkDeleteButton").style.display = "block";
 
@@ -104,20 +121,24 @@ function ContactList({ contacts, editContact, setContacts }) {
     }
   }
 
-  function handleBulkSelection() {
-    setAllSelected(true);
-    document.querySelectorAll(".deleteButton").forEach((checkbox) => {
-      checkbox.checked = !checkbox.checked;
+  function handleBulkSelection(e) {
 
-      document.getElementById("bulkDeleteButton").style.display =
-        checkbox.checked ? "block" : "none";
-    });
+    const checkBoxes = document.querySelectorAll(".deleteButton");
+   
+
+    checkBoxes.forEach(checkbox => {
+      checkbox.checked = e.target.checked;
+    })
+
+
+   document.getElementById("bulkDeleteButton").style.display = e.target.checked ? "block" : "none";
+    
   }
   // Conditional height style
   const tableStyle = {
-    height: contacts.length === 0 ? "80vh" : "auto", // Adjust '400px' as needed
-    backgroundImage:
-      contacts.length === 0 ? `url("../assets/404.svg")` : "none",
+    height: "80vh", // Adjust '400px' as needed
+    backgroundImage:"none",
+    // contacts.length === 0 ? `url("../assets/404.svg")` : "none",
     backgroundSize: "15%",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center",
@@ -154,7 +175,7 @@ function ContactList({ contacts, editContact, setContacts }) {
         </button>
             <button
                 id="bulkDeleteButton"
-                onClick={handleBulkDeleteSelection}
+                onClick={(e) => handleBulkDeleteSelection(e)}
                 className="p-2 flex flex-row border border-1 rounded-md bg-[#f64e4e] text-white hidden"
               >
                 {" "}
@@ -203,9 +224,9 @@ function ContactList({ contacts, editContact, setContacts }) {
     </section>
   );
 }
-ContactList.propTypes = {
-  contacts: PropTypes.array.isRequired,
-  editContact: PropTypes.func.isRequired,
-  setContacts: PropTypes.func.isRequired,
-};
+// ContactList.propTypes = {
+//   contacts: PropTypes.array.isRequired,
+//   editContact: PropTypes.func.isRequired,
+//   setContacts: PropTypes.func.isRequired,
+// };
 export default ContactList;

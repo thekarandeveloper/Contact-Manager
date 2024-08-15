@@ -21,9 +21,9 @@ function App() {
   const [limit] = useState(20)
   const [hasMore, setHasMore] = useState(true);
   const scrollableContaineRef = useRef(null)
-  // Functions
-
-  
+  const [totalContacts, setTotalContacts] = useState(0)
+ const [searchTerm, setSearchTerm] = useState("")
+  // Functions 
   const toggleModal = (currentHeading="", currentkey="")=>{
     setIsModalVisible(!isModalVisible)
     setHeading(currentHeading)
@@ -36,33 +36,71 @@ function App() {
 
   // Fetch Contacts
 
-  const fetchContacts = async (page = 1) => {
+  const fetchContacts = async (page = 1, searchTerm = '') => {
     try {
-        const response = await axios.get(`/api/contacts?page=${page}&limit=${limit}`);
-        const { contacts, total, totalPages } = response.data;
+        const response = await axios.get('/api/contacts', {
+            params: {
+                page: page,
+                limit: limit,
+                search: searchTerm
+            }
+        });
 
-        if (contacts.length === 0) {
+        const { contacts: newContacts, total, totalPages } = response.data;
+        setTotalContacts(total)
+        if (newContacts.length === 0) {
             setHasMore(false);
         } else {
-            setContacts(prevContacts => [...prevContacts, ...contacts]);
-            setFilteredContacts(prevContacts => [...prevContacts, ...contacts]);
+
+          setContacts(prevContacts => {
+            return page === 1 ? newContacts : [[...prevContacts,...newContacts]]
+          })
+            // If you want to filter contacts based on the search term,
+            // you might want to update filteredContacts separately
+            setFilteredContacts(prevContacts => {
+              return page === 1 ? newContacts : [[...prevContacts,...newContacts]]
+            });
+            setPage(page)
+            // Optionally, you can update pagination-related states if needed
+            // setTotal(total);
+            // setTotalPages(totalPages);
         }
     } catch (error) {
         console.error("Error fetching contacts:", error);
     }
 };
 
-  const handleSearch = (searchString) =>{
-    if (searchString === ""){
-      setFilteredContacts(contacts)
-    } else{
-      const lowerCasedSearchString = searchString.toLowerCase();
-      const filtered = contacts.filter(contact =>
-        contact.name.toLowerCase().includes(lowerCasedSearchString));
-      setFilteredContacts(filtered)
+
+  const handleSearch = async (searchString) =>{
+   
+    
+    setSearchTerm(searchString.toLowerCase())
+    console.log("This is search term", searchTerm)
+    try {
+
+      if (searchTerm === "") {
+        setFilteredContacts(contacts)
+      } else if (searchTerm !== ""){
+        const response = await axios.get('/api/contacts', {
+          params:{
+            search: searchTerm,
+            page:1,
+            limit:20
+          }
+        });
+
+      const filteredData = response.data.contacts
+      
+      setFilteredContacts(filteredData)
+      setContacts(filteredData)
+      console.log("This is filtered Data", filteredData)
+    }}
+    catch (error) {
+      console.error("Error Fetching Contacts", error);
     }
   };
   
+
   // Fetch Function on Intital Render
 
   useEffect(()=>{
@@ -72,8 +110,8 @@ function App() {
 
   return (
     <div className="App">
-      <Navbar toggleModal={toggleModal} totalContacts = {contacts} handleSearch={handleSearch}/>
-      <ContactList ref={scrollableContaineRef} contacts={filteredContacts} editContact={editContact} setContacts={fetchContacts}/>
+      <Navbar toggleModal={toggleModal} totalContacts = {totalContacts} handleSearch={handleSearch}/>
+      <ContactList ref={scrollableContaineRef} contacts={filteredContacts} editContact={editContact} setContacts={setFilteredContacts} searchTerm={searchTerm} />
       {isModalVisible && <Modal heading={heading} selectedKey={newkey} toggleModal={toggleModal} fetchContacts={fetchContacts} contactToUpdate={contactToUpdate} allContacts={contacts}/>}
     </div>
   );
