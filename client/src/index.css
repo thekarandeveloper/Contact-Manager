@@ -16,3 +16,7 @@ code {
     monospace;
 }
 
+.scrollable-container {
+  height: 80vh; /* Adjust based on your layout */
+  overflow-y: auto;
+}

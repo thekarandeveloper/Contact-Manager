@@ -72,15 +72,27 @@ exports.uploadCSV = async (req, res) => {
 
 // Get All Contacts
 
-exports.getContacts = async (req,res) =>{
-    try{
-        const contacts = await Contact.find();
-        res.json(contacts);
-    } catch (err){
-        res.status(500).json({msg: 'Server Error'});
+exports.getContacts = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20;
+        const skip = (page - 1) * limit;
+
+        const [contacts, total] = await Promise.all([
+            Contact.find().skip(skip).limit(limit).exec(),
+            Contact.countDocuments()
+        ]);
+
+        res.json({
+            contacts,
+            total,
+            totalPages: Math.ceil(total / limit)
+        });
+    } catch (err) {
+        console.error("Error fetching contacts:", err);
+        res.status(500).json({ msg: 'Server Error' });
     }
 };
-
 
 // Add New Contact
 

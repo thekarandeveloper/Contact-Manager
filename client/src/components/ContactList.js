@@ -1,16 +1,62 @@
 import { MdDeleteOutline } from "react-icons/md";
 import axios from "axios";
 import { useState } from "react";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { FixedSizeList as List } from "react-window";
 import ContactTableRow from "./ContactTableRow";
+import PropTypes from "prop-types"
+
 function ContactList({ contacts, editContact, setContacts }) {
+  const listRef = useRef(null)
   const [selectContact, setSelectContact] = useState("");
   const [allSelected, setAllSelected] = useState(false);
   var selectedContactIdList = [];
   const rowHeight = 50;
   const height = 600;
+ 
+  const [hasMore, setHasMore] = useState(true);
+  const loadMoreContacts = async () => {
+    if (hasMore) {
+      try {
+        // Fetch more contacts here and update the list
+        const response = await axios.get('/api/contacts'); // Adjust URL and parameters as needed
+        const { contacts: newContacts } = response.data;
+        if (newContacts.length > 0) {
+          setContacts(prevContacts => [...prevContacts, ...newContacts]);
+        } else {
+          setHasMore(false);
+        }
+      } catch (error) {
+        console.error("Error fetching more contacts:", error);
+      }
+    }
+  };
 
+
+  const handleScroll = ({scrollOffset}) => {
+
+    const container = listRef.current;
+
+    if (container && container.scrollHeight - scrollOffset <= height * 1.5){
+      loadMoreContacts()
+    }
+  
+  }
+  // useEffect(() => {
+  //   const container = listRef.current
+
+  //   if (container){
+  //     container.addEventListener('scroll', handleScroll)
+  //   }
+  //   return () => {
+  //     if(container){
+  //       container.removeEventListener('scroll', handleScroll)
+  //     }
+  //   };
+
+  // }, [contacts])
+
+  
   const handleDelete = async (id) => {
     await axios.delete(`/api/contacts/${id}`);
     setContacts(contacts.filter((contact) => contact._id !== id));
@@ -84,19 +130,19 @@ function ContactList({ contacts, editContact, setContacts }) {
         className="w-full bg-white rounded-lg contact-list flex flex-col"
         style={tableStyle}
       >
-        <div className="bg-[#e6e6e6cf] rounded-md w-[100%] flex flex-row items-center justify-between px-8 pr-14">
+        <div className="bg-[#e6e6e6cf] w-[100%] flex flex-row items-center justify-between px-8 pr-14">
           <div className="py-4 w-20 flex flex-shrink-0 justify-between">
             <input
               className="w-4 h-4 cursor-pointer"
               onClick={handleBulkSelection}
               type="checkbox"
             />
-            <div className="w-10 flex-shrink">S.No</div>
+            <div className="w-10 flex-shrink font-bold">S.No</div>
           </div>
           
-          <div className="w-60 flex flex-shrink-0 justify-center">Name</div>
-          <div className="w-48 flex flex-shrink-0 justify-center">Email</div>
-          <div className="w-84 flex flex-shrink-0 justify-center">Phone</div>
+          <div className="w-60 flex flex-shrink-0 justify-center font-bold">Name</div>
+          <div className="w-48 flex flex-shrink-0 justify-center font-bold">Email</div>
+          <div className="w-84 flex flex-shrink-0 justify-center font-bold">Phone</div>
           <div className="w-60 flex flex-shrink-0 text-gray-400 justify-end flex-row content-between">
           <button
           id="editButton"
@@ -117,18 +163,29 @@ function ContactList({ contacts, editContact, setContacts }) {
           </div>
         </div>
 
-        <div className="w-[100%]">
+        <div className="w-[100%] ">
           <List
             height={height}
             itemCount={contacts.length}
             itemSize={rowHeight}
             width="100%"
+            onItemsRendered={({ visibleStartIndex, visibleStopIndex }) => {
+    // If the last visible item is the last item in the list
+    if (visibleStopIndex === contacts.length - 1) {
+      loadMoreContacts();
+    }
+  }}
+            onScroll={handleScroll}
+            ref={listRef}
             itemData={{
               contacts,
               editContact,
               handleDelete,
               handleContactSelection,
-            }}
+            
+            }
+            
+            }
           >
             {({ index, style, data }) => (
               <ContactTableRow
@@ -146,5 +203,9 @@ function ContactList({ contacts, editContact, setContacts }) {
     </section>
   );
 }
-
+ContactList.propTypes = {
+  contacts: PropTypes.array.isRequired,
+  editContact: PropTypes.func.isRequired,
+  setContacts: PropTypes.func.isRequired,
+};
 export default ContactList;

@@ -5,10 +5,10 @@ function ContactTableRow({ index, style, data, editContact, handleDelete, handle
   const contact = data[index];
 
   return (
-    <div style={{ ...style}} className="w-[100%] flex flex-row items-center justify-between px-8">
+    <div style={{ ...style}} className="w-[100%] flex flex-row items-center justify-between px-8 py-8">
      
      <div className="w-20 flex flex-shrink-0 justify-between">
-     <input className="deleteButton h-4 cursor-pointer " type="checkbox" key={contact._id} onClick={() => {handleContactSelection(contact._id)}} />
+     <input className="w-4 deleteButton h-4 cursor-pointer " type="checkbox" key={contact._id} onClick={() => {handleContactSelection(contact._id)}} />
      <div className="w-10 flex flex-shrink-0 justify-center">{index+1}</div>
      </div>
       
