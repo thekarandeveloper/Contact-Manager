@@ -10,7 +10,7 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-app.use(`/${API_URL}/contacts`,require('./routes/contactRoutes'));
+app.use(`/contacts`,require('./routes/contactRoutes'));
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
