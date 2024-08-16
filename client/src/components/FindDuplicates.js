@@ -5,7 +5,7 @@ function FindDuplicates({contacts, fetchChanges, toggleModal}) {
  const [stausLine, setStatusLines] = useState("Total duplicates ")
   const [progress, setProgress] = useState(10);
   const [totalDuplicate, setTotalDuplicate] = useState(0)
-
+const API_URL = 'https://contact-manager-backend-chi.vercel.app'
   async function fetchDuplicates(){
     
     // for (let i = 0; i <= 30; i++) {
@@ -13,7 +13,7 @@ function FindDuplicates({contacts, fetchChanges, toggleModal}) {
     //   await new Promise((resolve) => setTimeout(resolve, 500)); // Add delay to simulate processing time
     // }
     try{
-      const response = await axios.get('/api/contacts/handle-duplicates');
+      const response = await axios.get(`${API_URL}/contacts/handle-duplicates`);
       setProgress(100)
       
 
@@ -33,7 +33,7 @@ function FindDuplicates({contacts, fetchChanges, toggleModal}) {
     document.getElementById("delete-button").style.opacity = 0.5
     document.getElementById("delete-button").disabled = true
     try{
-      const response = await axios.get('/api/contacts/handle-duplicates?delete=true');
+      const response = await axios.get(`${API_URL}/contacts/handle-duplicates?delete=true`);
       console.log("Duplicate Deleted", response.data.totalDeleted);
       document.getElementById("statusLine").innerHTML = "Deleting..."
       setProgress(80)

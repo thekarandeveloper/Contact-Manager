@@ -37,10 +37,10 @@ function App() {
   }
 
   // Fetch Contacts
-
+const API_URL = 'https://contact-manager-backend-chi.vercel.app'
   const fetchContacts = async (page = 1, searchTerm = '') => {
     try {
-        const response = await axios.get('/api/contacts', {
+        const response = await axios.get(`${API_URL}/contacts`, {
             params: {
                 page: page,
                 limit: limit,
@@ -83,7 +83,7 @@ function App() {
       if (searchTerm === "") {
         setFilteredContacts(contacts)
       } else if (searchTerm !== ""){
-        const response = await axios.get('/api/contacts', {
+        const response = await axios.get(`${API_URL}/contacts`, {
           params:{
             search: searchTerm,
             page:1,
@@ -107,7 +107,7 @@ function App() {
 
   const fetchDuplicates = async () =>{
     try{
-      const response = await axios.get('/api/contacts/duplicates');
+      const response = await axios.get(`${API_URL}/contacts/duplicates`);
       const {duplicates, summary} = response.data
       console.log("Duplicate contacts:", duplicates);
       console.log("Summary of duplicates:", summary);

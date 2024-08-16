@@ -15,7 +15,7 @@ function ContactList({ contacts, editContact, setContacts, searchTerm, checkedId
   const rowHeight = 50;
   const height = 600;
   const [page, setPage] = useState(1);
-
+const API_URL = 'https://contact-manager-backend-chi.vercel.app'
   const [hasMore, setHasMore] = useState(true);
   const loadMoreContacts = async (searchString = searchTerm) => {
     if (hasMore) {
@@ -23,7 +23,7 @@ function ContactList({ contacts, editContact, setContacts, searchTerm, checkedId
             const nextPage = page + 1;
             const searchTerm = searchString.toLowerCase(); // Normalize the search term
             
-            const response = await axios.get('/api/contacts', {
+            const response = await axios.get(`${API_URL}/contacts`, {
                 params: {
                     page: nextPage,
                     limit: 20,
