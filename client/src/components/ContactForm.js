@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-function ContactForm({ contact, setContact, setContacts, fetchContactsData, toggleModal }) {
+function ContactForm({ contact, setContact, setContacts, fetchContactsData, toggleModal,  }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
   // Load contact data if 'contact' prop is provided
+  
   useEffect(() => {
     if (contact) {
       setName(contact.name);

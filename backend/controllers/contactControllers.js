@@ -70,6 +70,9 @@ exports.uploadCSV = async (req, res) => {
     }
 };
 
+
+
+
 // Get All Contacts
 
 exports.getContacts = async (req, res) => {
@@ -114,6 +117,47 @@ exports.addContact = async(req,res) => {
 }
 
 
+// Find Duplicates
+
+exports.handleDuplicates = async (req, res) => {
+    try {
+        // Step 1: Find duplicate phone numbers
+        const duplicates = await Contact.aggregate([
+            { $group: { _id: "$phone", count: { $sum: 1 }, ids: { $push: "$_id" } } },
+            { $match: { count: { $gt: 1 } } }
+        ]);
+
+        // Calculate the total number of duplicate entries
+        const totalDuplicates = duplicates.reduce((acc, duplicate) => acc + duplicate.count - 1, 0);
+
+        // Check if the 'delete' parameter is true
+        const shouldDelete = req.query.delete === 'true';
+
+        if (shouldDelete) {
+            // Step 2: For each duplicate, keep one and delete the others
+            const deletionTasks = duplicates.map(async (duplicate) => {
+                const idsToDelete = duplicate.ids.slice(1);  // Keep the first instance, delete the rest
+
+                // Delete contacts with those IDs
+                return Contact.deleteMany({ _id: { $in: idsToDelete } });
+            });
+
+            // Execute all deletions in parallel
+            await Promise.all(deletionTasks);
+
+            return res.json({ msg: 'Duplicate contacts removed successfully', totalDeleted: totalDuplicates });
+        }
+
+        // If not deleting, return the number of duplicates found
+        res.json({ msg: 'Duplicates found', totalDuplicates });
+
+    } catch (err) {
+        console.error("Error handling duplicates:", err);
+        res.status(500).json({ msg: 'Server Error' });
+    }
+};
+
+
 // Update Contact
 
 exports.updateContact = async (req,res) =>{
@@ -147,3 +191,27 @@ exports.deleteAllContact = async(req,res) => {
         res.status(400).json({msg: "Bad Request"})
     }
 };
+
+
+// Bulk Delete Contacts
+
+exports.bulkDeleteContact = async (req,res) => {
+    try{
+        const {ids} = req.body;
+        if(!Array.isArray(ids) || ids.length === 0){
+            return res.status(400).json({msg: 'Invalid request. No IDs Provided'})
+        }
+
+        const result = await Contact.deleteMany({_id:{$in:ids}});
+
+
+        res.json({
+            deletedCount: result.deletedCount,
+            message: 'Contacts deleted successfully.'
+        });
+
+    } catch (err){
+        console.error("Error deleting successfully.", err);
+        res.status(500).json({msg:'Server Error'});
+    }
+}

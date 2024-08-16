@@ -25,7 +25,7 @@ function Navbar({toggleModal, totalContacts, handleSearch}) {
         <div className='controllers flex flex-row h-full'>
             <button className='importButton px-4 py-2 mx-4 bg-[#0060ef] text-white rounded-md flex flex-row items-center border-2 border-[#0060ef] hover:border-black' onClick={() => toggleModal('Add Contact', "add")}>Add &ensp; <IoMdAddCircle /></button>
             <button className='importButton px-4 py-2 mx-4 bg-[#0060ef] text-white rounded-md flex flex-row items-center border-2 border-[#0060ef] hover:border-black' onClick={() => toggleModal('Import Contacts', "import")}>Import &ensp; <FaFileImport /></button>
-            <button onClick={() => toggleModal('Duplicate Contacts', "duplicates")} className='duplicateButton px-4 py-2 ml-2 bg-[#0d1e38] text-white border border-1 rounded-md flex flex-row items-center'>Find Duplicates</button>
+            <button onClick={() => toggleModal('Duplicate Contacts', "delete-duplicates")} className='duplicateButton px-4 py-2 ml-2 bg-[#0d1e38] text-white border border-1 rounded-md flex flex-row items-center'>Find Duplicates</button>
             
         </div>
     </section>

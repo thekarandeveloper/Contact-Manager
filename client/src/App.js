@@ -23,6 +23,8 @@ function App() {
   const scrollableContaineRef = useRef(null)
   const [totalContacts, setTotalContacts] = useState(0)
  const [searchTerm, setSearchTerm] = useState("")
+ const [duplicateIds, setDuplicateIds] = useState(new Set());
+  const [checkedIds, setCheckedIds] = useState(new Set());
   // Functions 
   const toggleModal = (currentHeading="", currentkey="")=>{
     setIsModalVisible(!isModalVisible)
@@ -101,18 +103,31 @@ function App() {
   };
   
 
+  // Fetch Duplicates
+
+  const fetchDuplicates = async () =>{
+    try{
+      const response = await axios.get('/api/contacts/duplicates');
+      const {duplicates, summary} = response.data
+      console.log("Duplicate contacts:", duplicates);
+      console.log("Summary of duplicates:", summary);
+    } catch (error){
+      console.error("Error Fetching Duplicates", error);
+    }
+  }
+
+
   // Fetch Function on Intital Render
 
   useEffect(()=>{
     fetchContacts(page);
   },[page]);
 
-
   return (
     <div className="App">
-      <Navbar toggleModal={toggleModal} totalContacts = {totalContacts} handleSearch={handleSearch}/>
-      <ContactList ref={scrollableContaineRef} contacts={filteredContacts} editContact={editContact} setContacts={setFilteredContacts} searchTerm={searchTerm} />
-      {isModalVisible && <Modal heading={heading} selectedKey={newkey} toggleModal={toggleModal} fetchContacts={fetchContacts} contactToUpdate={contactToUpdate} allContacts={contacts}/>}
+      <Navbar toggleModal={toggleModal} totalContacts = {totalContacts} handleSearch={handleSearch} />
+      <ContactList ref={scrollableContaineRef} contacts={filteredContacts} editContact={editContact} setContacts={setFilteredContacts} searchTerm={searchTerm} checkedIds={checkedIds} />
+      {isModalVisible && <Modal heading={heading} selectedKey={newkey} toggleModal={toggleModal} fetchContacts={fetchContacts} contactToUpdate={contactToUpdate} allContacts={contacts}  refname={scrollableContaineRef} filteredContacts={filteredContacts} editContact={editContact} setFilteredContacts={setFilteredContacts} searchTerm={searchTerm}/>}
     </div>
   );
 }

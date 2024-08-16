@@ -6,7 +6,7 @@ import { FixedSizeList as List } from "react-window";
 import ContactTableRow from "./ContactTableRow";
 import PropTypes from "prop-types"
 
-function ContactList({ contacts, editContact, setContacts, searchTerm }) {
+function ContactList({ contacts, editContact, setContacts, searchTerm, checkedIds }) {
   const listRef = useRef(null)
   
   const [selectContact, setSelectContact] = useState("");
@@ -56,21 +56,7 @@ function ContactList({ contacts, editContact, setContacts, searchTerm }) {
     }
   
   }
-  // useEffect(() => {
-  //   const container = listRef.current
-
-  //   if (container){
-  //     container.addEventListener('scroll', handleScroll)
-  //   }
-  //   return () => {
-  //     if(container){
-  //       container.removeEventListener('scroll', handleScroll)
-  //     }
-  //   };
-
-  // }, [contacts])
-
-  
+    
   const handleDelete = async (id) => {
     await axios.delete(`/api/contacts/${id}`);
     setContacts(prevContacts => prevContacts.filter((contact) => contact._id !== id));
@@ -216,6 +202,7 @@ function ContactList({ contacts, editContact, setContacts, searchTerm }) {
                 editContact={data.editContact}
                 handleDelete={data.handleDelete}
                 handleContactSelection={data.handleContactSelection}
+                checkedIds = {checkedIds}
               ></ContactTableRow>
             )}
           </List>
