@@ -6,5 +6,5 @@
     "ignore": [
         "node_modules"
     ],
-    "exec": "node ./backend/server.js"
+    "exec": "node server.js"
 }
