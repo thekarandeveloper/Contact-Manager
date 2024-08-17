@@ -23,7 +23,7 @@ function ContactList({ contacts, editContact, setContacts, searchTerm, checkedId
             const nextPage = page + 1;
             const searchTerm = searchString.toLowerCase(); // Normalize the search term
             
-            const response = await axios.get(`/api/contacts`, {
+            const response = await axios.get(`https://cm-backend-service-8dc88f99d89b.herokuapp.com/api/contacts`, {
                 params: {
                     page: nextPage,
                     limit: 20,
@@ -58,11 +58,11 @@ function ContactList({ contacts, editContact, setContacts, searchTerm, checkedId
   }
     
   const handleDelete = async (id) => {
-    await axios.delete(`/api/contacts/${id}`);
+    await axios.delete(`https://cm-backend-service-8dc88f99d89b.herokuapp.com/api/contacts/${id}`);
     setContacts(prevContacts => prevContacts.filter((contact) => contact._id !== id));
   };
   const handleBulkDelete = async () => {
-    await axios.delete("/api/contacts");
+    await axios.delete("https://cm-backend-service-8dc88f99d89b.herokuapp.com/api/contacts");
     setContacts([]);
     document.getElementById("bulkDeleteButton").style.display = "none";
   };

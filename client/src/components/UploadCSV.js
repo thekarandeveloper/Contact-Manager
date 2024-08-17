@@ -25,7 +25,7 @@ function UploadCSV({fetchChanges, toggleModal}) {
       setUploading(true);
 
       try {
-        const response = await axios.post('/api/contacts/upload', formData, {
+        const response = await axios.post('https://cm-backend-service-8dc88f99d89b.herokuapp.com/api/contacts/upload', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

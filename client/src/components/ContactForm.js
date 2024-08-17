@@ -29,12 +29,12 @@ function ContactForm({ contact, setContact, setContacts, fetchContactsData, togg
       if (contact) {
         console.log("Trying to Update Contact");
         // Update existing contact
-        await axios.put(`/api/contacts/${contact._id}`, newContact);
+        await axios.put(`https://cm-backend-service-8dc88f99d89b.herokuapp.com/api/contacts/${contact._id}`, newContact);
         fetchContacts()
       } else {
         // Add new contact
         console.log("Trying to Add Contact");
-        await axios.post("/api/contacts", newContact);
+        await axios.post("https://cm-backend-service-8dc88f99d89b.herokuapp.com/api/contacts", newContact);
         toggleModal()
       }
       
