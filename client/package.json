@@ -41,7 +41,7 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:5004",
+  "proxy": "https://cm-backend-service-8dc88f99d89b.herokuapp.com/",
   "devDependencies": {
     "tailwindcss": "^3.4.7"
   }
