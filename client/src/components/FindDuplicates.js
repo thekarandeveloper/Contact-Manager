@@ -13,7 +13,7 @@ const API_URL = 'https://contact-manager-backend-chi.vercel.app'
     //   await new Promise((resolve) => setTimeout(resolve, 500)); // Add delay to simulate processing time
     // }
     try{
-      const response = await axios.get(`${API_URL}/contacts/handle-duplicates`);
+      const response = await axios.get(`/api/contacts/handle-duplicates`);
       setProgress(100)
       
 
@@ -33,7 +33,7 @@ const API_URL = 'https://contact-manager-backend-chi.vercel.app'
     document.getElementById("delete-button").style.opacity = 0.5
     document.getElementById("delete-button").disabled = true
     try{
-      const response = await axios.get(`${API_URL}/contacts/handle-duplicates?delete=true`);
+      const response = await axios.get(`/api/contacts/handle-duplicates?delete=true`);
       console.log("Duplicate Deleted", response.data.totalDeleted);
       document.getElementById("statusLine").innerHTML = "Deleting..."
       setProgress(80)

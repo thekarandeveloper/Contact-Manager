@@ -23,7 +23,7 @@ const API_URL = 'https://contact-manager-backend-chi.vercel.app'
             const nextPage = page + 1;
             const searchTerm = searchString.toLowerCase(); // Normalize the search term
             
-            const response = await axios.get(`${API_URL}/contacts`, {
+            const response = await axios.get(`/api/contacts`, {
                 params: {
                     page: nextPage,
                     limit: 20,
