@@ -3,7 +3,8 @@ const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 
-const API_URL = 'https://contact-manager-backend-chi.vercel.app/'
+const API_URL = '/api'
+
 const app = express();
 connectDB();
 
