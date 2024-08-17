@@ -3,14 +3,14 @@ const express = require('express');
 const connectDB = require('./config/db');
 const cors = require('cors');
 
-// const API_URL = 'https://contact-manager-backend-chi.vercel.app/'
+const API_URL = 'https://contact-manager-backend-chi.vercel.app/'
 const app = express();
 connectDB();
 
 app.use(cors());
 app.use(express.json());
 
-app.use(`/api/contacts`,require('./routes/contactRoutes'));
+app.use(`${API_URL}/contacts`,require('./routes/contactRoutes'));
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
