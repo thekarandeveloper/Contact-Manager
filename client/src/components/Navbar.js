@@ -44,21 +44,21 @@ function Navbar({toggleModal, totalContacts, handleSearch}) {
         className="importButton px-2 md:px-4 md:mx-0 py-2 bg-[#0060ef] text-white rounded-full md:rounded-md flex items-center border-2 border-[#0060ef] hover:border-black"
         onClick={() => toggleModal('Add Contact', "add")}
       >
-        <span className="hidden md:block">Add</span> <IoMdAddCircle />
+        <span className="hidden md:block md:pr-2">Add</span> <IoMdAddCircle />
       </button>
       
       <button 
         className="importButton px-2 md:px-4 md:mx-0 py-2 bg-[#0060ef] text-white rounded-full md:rounded-md flex items-center border-2 border-[#0060ef] hover:border-black"
         onClick={() => toggleModal('Import Contacts', "import")}
       >
-        <span className="hidden md:block">Import</span> <FaFileImport />
+        <span className="hidden md:block md:pr-2">Import</span> <FaFileImport />
       </button>
       
       <button 
         className="duplicateButton px-4 py-2 bg-[#0d1e38] text-white rounded-full md:rounded-md flex items-center"
         onClick={() => toggleModal('Duplicate Contacts', "delete-duplicates")}
       >
-        <span className="hidden md:block">Find Duplicates </span>
+        <span className="hidden md:block md:pr-2">Find Duplicates </span>
         <HiDuplicate />
       </button>
     </div>
