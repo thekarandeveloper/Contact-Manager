@@ -5,6 +5,7 @@ import Modal from "./components/Modal"
 import ContactList from "./components/ContactList";
 import './index.css';
 import axios from "axios";
+import Spinner from "./components/spinner";
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
  const [searchTerm, setSearchTerm] = useState("")
  const [duplicateIds, setDuplicateIds] = useState(new Set());
   const [checkedIds, setCheckedIds] = useState(new Set());
+  const [isLoading, setIsLoading] = useState(false);
   // Functions 
   const toggleModal = (currentHeading="", currentkey="")=>{
     setIsModalVisible(!isModalVisible)
@@ -39,6 +41,7 @@ function App() {
   // Fetch Contacts
 const API_URL = 'https://contact-manager-backend-chi.vercel.app'
   const fetchContacts = async (page = 1, searchTerm = '') => {
+    setIsLoading(true);
     try {
         const response = await axios.get(`https://cm-backend-service-8dc88f99d89b.herokuapp.com/api/contacts`, {
             params: {
@@ -69,6 +72,8 @@ const API_URL = 'https://contact-manager-backend-chi.vercel.app'
         }
     } catch (error) {
         console.error("Error fetching contacts:", error);
+    } finally {
+      setIsLoading(false); // End loading
     }
 };
 
@@ -126,7 +131,12 @@ const API_URL = 'https://contact-manager-backend-chi.vercel.app'
   return (
     <div className="App">
       <Navbar toggleModal={toggleModal} totalContacts = {totalContacts} handleSearch={handleSearch} />
-      <ContactList ref={scrollableContaineRef} contacts={filteredContacts} editContact={editContact} setContacts={setFilteredContacts} searchTerm={searchTerm} checkedIds={checkedIds} />
+      {isLoading ? (
+        <Spinner /> // Show spinner while loading
+      ) : (
+        <ContactList ref={scrollableContaineRef} contacts={filteredContacts} editContact={editContact} setContacts={setFilteredContacts} searchTerm={searchTerm} checkedIds={checkedIds} />
+
+      )}
       {isModalVisible && <Modal heading={heading} selectedKey={newkey} toggleModal={toggleModal} fetchContacts={fetchContacts} contactToUpdate={contactToUpdate} allContacts={contacts}  refname={scrollableContaineRef} filteredContacts={filteredContacts} editContact={editContact} setFilteredContacts={setFilteredContacts} searchTerm={searchTerm}/>}
     </div>
   );
