@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react'
 import { IoMdAddCircle } from "react-icons/io";
 import { FaFileImport } from "react-icons/fa";
+import { HiDuplicate } from "react-icons/hi";
 import debounce from 'lodash.debounce';
 function Navbar({toggleModal, totalContacts, handleSearch}) {
 
@@ -57,7 +58,8 @@ function Navbar({toggleModal, totalContacts, handleSearch}) {
         className="duplicateButton px-4 py-2 bg-[#0d1e38] text-white rounded-full md:rounded-md flex items-center"
         onClick={() => toggleModal('Duplicate Contacts', "delete-duplicates")}
       >
-        <span className="hidden md:block">Find Duplicates</span>
+        <span className="hidden md:block">Find Duplicates </span>
+        <HiDuplicate />
       </button>
     </div>
   </section>
