@@ -88,6 +88,7 @@ function ContactList({ contacts, editContact, setContacts, searchTerm, checkedId
     console.log(selectedRow);
 
     if (selectedRow.checked){
+      e.target.checked = true;
       selectedContactIdList.push(selectedRow.dataset.id);
     } else if (!selectedRow.checked){
       selectedContactIdList.pop(selectedRow.dataset.id);
