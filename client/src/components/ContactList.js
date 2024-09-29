@@ -138,19 +138,19 @@ function ContactList({ contacts, editContact, setContacts, searchTerm, checkedId
         style={tableStyle}
       >
         <div className="bg-[#e6e6e6cf] w-[100%] flex flex-row items-center justify-between px-8 pr-14">
-          <div className="py-4 w-20 flex flex-shrink-0 justify-between">
+          <div className="py-4 md:w-20 flex flex-shrink-0 justify-between">
             <input
-              className="w-4 h-4 cursor-pointer"
+              className="md:w-4 h-4 cursor-pointer"
               onClick={handleBulkSelection}
               type="checkbox"
             />
-            <div className="w-10 flex-shrink font-bold">S.No</div>
+            <div className="md:w-10 hidden md:flex flex-shrink font-bold">S.No</div>
           </div>
           
           <div className="w-60 flex flex-shrink-0 justify-center font-bold">Name</div>
-          <div className="w-48 flex flex-shrink-0 justify-center font-bold">Email</div>
-          <div className="w-84 flex flex-shrink-0 justify-center font-bold">Phone</div>
-          <div className="w-60 flex flex-shrink-0 text-gray-400 justify-end flex-row content-between">
+          <div className="w-48 hidden md:flex flex-shrink-0 justify-center font-bold">Email</div>
+          <div className="w-84 hidden md:flex flex-shrink-0 justify-center font-bold">Phone</div>
+          <div className="w-60 hidden md:flex flex-shrink-0 text-gray-400 justify-end flex-row content-between">
           <button
           id="editButton"
           

@@ -7,15 +7,15 @@ function ContactTableRow({ index, style, data, editContact, handleDelete, handle
   return (
     <div style={{ ...style}} className="w-[100%] flex flex-row items-center justify-between px-8 py-8">
      
-     <div className="w-20 flex flex-shrink-0 justify-between">
-     <input className="w-4 deleteButton h-4 cursor-pointer " type="checkbox" data-id={contact._id}  checked={checkedIds.has(contact._id)} key={contact._id} onClick={(e) => {handleContactSelection(e)}} />
-     <div className="w-10 flex flex-shrink-0 justify-center">{index+1}</div>
+     <div className="md:w-20 flex flex-shrink-0 justify-between">
+     <input className="md:w-4 deleteButton h-4 cursor-pointer " type="checkbox" data-id={contact._id}  checked={checkedIds.has(contact._id)} key={contact._id} onClick={(e) => {handleContactSelection(e)}} />
+     <div className="md:w-10 hidden md:flex flex-shrink-0 justify-center">{index+1}</div>
      </div>
       
       <div className="w-60 flex flex-shrink-0 justify-center">{contact.name}</div>
-      <div className="w-48 flex flex-shrink-0 justify-center">{contact.email}</div>
-      <div className="w-84 flex flex-shrink-0 justify-center">{contact.phone}</div>
-      <div className="w-60 flex flex-shrink-0 text-gray-400 justify-end flex-row content-between">
+      <div className="md:w-48 hidden md:flex flex-shrink-0 justify-center">{contact.email}</div>
+      <div className="md:w-84 hidden md:flex flex-shrink-0 justify-center">{contact.phone}</div>
+      <div className="md:w-60 hidden md:flex flex-shrink-0 text-gray-400 justify-end flex-row content-between">
         <button
           id="editButton"
           onClick={() => editContact(contact)}
