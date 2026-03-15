@@ -4,6 +4,86 @@ const path = require('path');
 const fs = require('fs');
 const { parse } = require('fast-csv');
 
+const CONTACT_TEMPLATE_FIELDS = ['name', 'email', 'phone'];
+
+const buildTemplateContact = (index = null) => {
+    if (index === null) {
+        return { name: '', email: '', phone: '' };
+    }
+
+    const serial = String(index + 1).padStart(7, '0');
+    return {
+        name: `Contact ${serial}`,
+        email: `contact${serial}@example.com`,
+        phone: `900000${String(index % 10000).padStart(4, '0')}`,
+    };
+};
+
+const normalizeContact = (contact = {}) => ({
+    name: String(contact.name ?? '').trim(),
+    email: String(contact.email ?? '').trim(),
+    phone: String(contact.phone ?? '').trim(),
+});
+
+const validateContacts = (contacts) => {
+    if (!Array.isArray(contacts) || contacts.length === 0) {
+        throw new Error('No contacts found in the uploaded file');
+    }
+
+    const invalidContact = contacts.find((contact) => {
+        const normalized = normalizeContact(contact);
+        return CONTACT_TEMPLATE_FIELDS.some((field) => normalized[field] === '');
+    });
+
+    if (invalidContact) {
+        throw new Error('Each contact must include non-empty name, email, and phone values');
+    }
+
+    return contacts.map(normalizeContact);
+};
+
+const parseJsonContacts = (filePath) => {
+    const fileContent = fs.readFileSync(filePath, 'utf-8');
+    const parsed = JSON.parse(fileContent);
+
+    if (!Array.isArray(parsed)) {
+        throw new Error('JSON import expects an array of contacts');
+    }
+
+    return validateContacts(parsed);
+};
+
+const parseCsvContacts = (filePath) =>
+    new Promise((resolve, reject) => {
+        const contacts = [];
+
+        fs.createReadStream(filePath)
+            .pipe(parse({ headers: true, delimiter: ',' }))
+            .on('data', (row) => contacts.push(row))
+            .on('end', () => {
+                try {
+                    resolve(validateContacts(contacts));
+                } catch (error) {
+                    reject(error);
+                }
+            })
+            .on('error', reject);
+    });
+
+const parseUploadedContacts = async (filePath) => {
+    const extension = path.extname(filePath).toLowerCase();
+
+    if (extension === '.json') {
+        return parseJsonContacts(filePath);
+    }
+
+    if (extension === '.csv') {
+        return parseCsvContacts(filePath);
+    }
+
+    throw new Error('Only CSV and JSON files are allowed');
+};
+
 // Configure multer storage and file filter
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -19,8 +99,9 @@ const storage = multer.diskStorage({
 });
   
 const fileFilter = (req, file, cb) => {
-    if (!file.originalname.endsWith('.csv')) {
-        return cb(new Error('Only CSV files are allowed'), false);
+    const extension = path.extname(file.originalname).toLowerCase();
+    if (!['.csv', '.json'].includes(extension)) {
+        return cb(new Error('Only CSV and JSON files are allowed'), false);
     }
     cb(null, true);
 };
@@ -31,7 +112,7 @@ const upload = multer({
 }).single('file');
   
 // Route to handle CSV file upload
-exports.uploadCSV = async (req, res) => {
+exports.uploadContacts = async (req, res) => {
     try {
         // Use multer to handle the file upload
         await new Promise((resolve, reject) => {
@@ -48,26 +129,46 @@ exports.uploadCSV = async (req, res) => {
         }
 
         const filePath = path.join(__dirname, '../uploads', req.file.filename);
-        const contacts = [];
+        const contacts = await parseUploadedContacts(filePath);
 
-        fs.createReadStream(filePath)
-            .pipe(parse({ headers: true, delimiter: ',' }))
-            .on('data', (row) => contacts.push(row))
-            .on('end', async () => {
-                try {
-                    await Contact.insertMany(contacts);
-                    fs.unlinkSync(filePath); // Clean up the file after processing
-                    res.json({ msg: 'Contacts imported successfully', count: contacts.length });
-                } catch (err) {
-                    res.status(500).json({ msg: 'Error importing contacts', error: err.message });
-                }
-            })
-            .on('error', (err) => {
-                res.status(500).json({ msg: 'Error reading CSV file', error: err.message });
-            });
+        await Contact.insertMany(contacts);
+        fs.unlinkSync(filePath); // Clean up the file after processing
+        res.json({ msg: 'Contacts imported successfully', count: contacts.length });
     } catch (err) {
+        if (req.file) {
+            const filePath = path.join(__dirname, '../uploads', req.file.filename);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        }
         res.status(500).json({ msg: 'Error processing file upload', error: err.message });
     }
+};
+
+exports.downloadJsonTemplate = (req, res) => {
+    const requestedCount = Number.parseInt(req.query.count, 10);
+    const recordCount = Number.isNaN(requestedCount) ? 0 : Math.max(0, requestedCount);
+    const safeCount = Math.min(recordCount, 1000000);
+    const isEmptyTemplate = safeCount === 0;
+    const filename = isEmptyTemplate
+        ? 'contacts-empty-template.json'
+        : `contacts-template-${safeCount}.json`;
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+
+    if (isEmptyTemplate) {
+        res.end(JSON.stringify([buildTemplateContact(null)], null, 2));
+        return;
+    }
+
+    res.write('[\n');
+    for (let index = 0; index < safeCount; index += 1) {
+        const contactJson = JSON.stringify(buildTemplateContact(index));
+        const suffix = index === safeCount - 1 ? '\n' : ',\n';
+        res.write(`  ${contactJson}${suffix}`);
+    }
+    res.end(']');
 };
 
 
